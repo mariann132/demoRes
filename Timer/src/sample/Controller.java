@@ -41,7 +41,7 @@ public class Controller {
             int w =0;
             @Override
             public void handle(ActionEvent event) {
-                System.out.println("this is called every 5 seconds on UI thread " + w);
+                System.out.println("new something " + w);
                w++;
             }
         }));
