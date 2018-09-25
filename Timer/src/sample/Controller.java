@@ -3,106 +3,135 @@ package sample;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.util.Duration;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+
+import java.awt.*;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
+
 
 public class Controller {
 
     @FXML
-    private Button button;
+    private Button buttonSTART;
+    @FXML
+    private Button buttonRESET;
+    @FXML
+    private Button buttonSTOP;
     @FXML
     private TextField textField;
     @FXML
     private Label time;
 
-    private int minute;
-    private int hour;
-    private int second;
 
-    private  Timer timer = new Timer();
-    Timeline fiveSecondsWonder;
-    static int i = 0;
+    static int interval = -1;
+
+    private boolean hasStarted = false;
+    private String secs;
+
+    static Timeline timeline;
+
+    @FXML
+    public void initialize(){
+
+        time.setText("00:00");
+
+
+    }
+
+
     public void printSomething(){
 
 
-         fiveSecondsWonder = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {
 
-            int w =0;
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("new something " + w);
-               w++;
-            }
+
+
+
+
+
+        if(interval == -1) {
+            updateCountDownText();
+            interval = Integer.parseInt(secs) * 60;
+        }
+
+
+        if (interval > 1) {
+            buttonSTART.setDisable(true);
+            buttonRESET.setDisable(true);
+        }
+        else {
+            buttonSTART.setDisable(false);
+            buttonRESET.setDisable(false);
+        }
+        timeline = new Timeline(new KeyFrame(Duration.seconds(1), ev -> {
+            hasStarted = true;
+
+                        time.setText(String.format(Locale.getDefault(), "%02d:%02d",interval / 60,  setInterval() % 60 ));
+
         }));
-        fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
-        fiveSecondsWonder.play();
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
 
 
 
 
+    }
+
+    private void updateCountDownText() {
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                textField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
+
+        secs = textField.getText();
 
 
-//
-//
-//        timer.schedule(
-//                new TimerTask() {
-//
-//                    @Override
-//                    public void run() {
-//                        System.out.println("ping");
-//                    }
-//                }, 0, 1000);
+        String timew = String.format(Locale.getDefault(),"%02d:%02d", Integer.parseInt(secs), 0);
+
+        interval = Integer.parseInt(secs)* 60;
+
+        time.setText(timew);
+
+
+    }
+
+    public void resetTimer(){
+        updateCountDownText();
+    }
 
 
 
+    private static final int setInterval() {
+        if (interval == 1) {
+            timeline.stop();
+            Toolkit.getDefaultToolkit().beep();
+        }
+        return interval--;
     }
 
     public void stopSomething(){
 
+        if(hasStarted){
+            timeline.stop();
+            buttonSTART.setDisable(false);
+            buttonRESET.setDisable(false);
+            buttonRESET.setVisible(true);
+            secs = String.valueOf(interval);
 
-       fiveSecondsWonder.stop();
+
+        }
 
 
 
 
     }
 
-    @FXML
-    public void initialize() {
 
 
-
-
-
-
-//        int min = 25;
-//        Timeline clock = new Timeline(new KeyFrame(Duration.ZERO, e -> {
-//
-//
-//            second = LocalDateTime.now().getSecond();
-//            minute = 25;
-//            //hour = LocalDateTime.now().getHour();
-//            time.setText(String.format(Locale.getDefault(),"%02d:%02d",  minute, second));
-//        }),
-//                new KeyFrame(Duration.seconds(1))
-//        );
-//        clock.setCycleCount(Animation.INDEFINITE);
-//        clock.play();
-
-   }
-
-   public void startTime(){
-
-   }
 }
